@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/ant0ine/go-json-rest/rest"
@@ -54,7 +55,23 @@ type Impl struct {
 
 func (i *Impl) InitDB() {
 	var err error
-	i.DB, err = gorm.Open("mysql", "root:wyyzmwy@tcp(10.97.31.116:23306)/resttest?charset=utf8&parseTime=True")
+	user := os.Getenv("DB_USER")
+	pass := os.Getenv("DB_PASS")
+	host := os.Getenv("DB_HOST")
+	port := os.Getenv("DB_PORT")
+
+	if user == "" {
+		user = "root"
+	}
+	if host == "" {
+		host = "localhost"
+	}
+	if port == "" {
+		port = "3306"
+	}
+	dbStr := user + ":" + pass + "@tcp(" + host + ":" + port + ")/resttest?charset=utf8&parseTime=True"
+
+	i.DB, err = gorm.Open("mysql", dbStr)
 	if err != nil {
 		log.Fatalf("Got error when connect database, the error is '%v'", err)
 	}
