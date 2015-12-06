@@ -81,7 +81,7 @@ func main() {
 	newDockerComposePath := "docker-compose-" + port + ".yml"
 
 	createNewConfigFile(dockerFilePath, newDockerFilePath, map[string]string{"RTM_SERVER_NAME_PORT": servername + ":" + port, "RTM_SOURCE_FOLDER": src, "RTM_COMMIT_ID": commit, "RTM_DB_HOST": port + "_db_1"})
-	createNewConfigFile(dockerComposePath, newDockerComposePath, map[string]string{"RTM_PORT": port, "RTM_DOFILE": newDockerFilePath})
+	createNewConfigFile(dockerComposePath, newDockerComposePath, map[string]string{"RTM_PORT": port, "RTM_DOFILE": newDockerFilePath, "RTM_DB_HOST": port + "_db_1"})
 
 	cmd := exec.Command("docker-compose", "-f", newDockerComposePath, "-p", port, "up", "-d")
 	cmd.Stdout = os.Stdout
