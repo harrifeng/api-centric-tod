@@ -55,22 +55,18 @@ type Impl struct {
 
 func (i *Impl) InitDB() {
 	var err error
-	user := os.Getenv("DB_USER")
-	pass := os.Getenv("DB_PASS")
 	host := os.Getenv("DB_HOST")
-	port := os.Getenv("DB_PORT")
-
-	if user == "" {
-		user = "root"
-	}
 	if host == "" {
 		host = "localhost"
 	}
-	if port == "" {
-		port = "3306"
-	}
+	user := "root"
+	port := "3306"
+	pass := ""
 	dbStr := user + ":" + pass + "@tcp(" + host + ":" + port + ")/resttest?charset=utf8&parseTime=True"
 
+	fmt.Println("---------------------")
+	fmt.Println(dbStr)
+	fmt.Println("---------------------")
 	i.DB, err = gorm.Open("mysql", dbStr)
 	if err != nil {
 		log.Fatalf("Got error when connect database, the error is '%v'", err)
