@@ -1,0 +1,10 @@
+FROM golang
+
+# ENV http_proxy 172.28.64.41:8080
+# ENV https_proxy 172.28.64.41:8080
+
+ENV DB_HOST  RTM_DB_HOST
+
+RUN go get github.com/harrifeng/api-centric-todo
+WORKDIR /go/src/github.com/harrifeng/api-centric-todo
+CMD main
