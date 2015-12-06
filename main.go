@@ -64,9 +64,9 @@ func (i *Impl) InitDB() {
 	pass := ""
 	dbStr := user + ":" + pass + "@tcp(" + host + ":" + port + ")/resttest?charset=utf8&parseTime=True"
 
-	fmt.Println("---------------------")
-	fmt.Println(dbStr)
-	fmt.Println("---------------------")
+	log.Println("--------------------")
+	log.Println(dbStr)
+	log.Println("--------------------")
 	i.DB, err = gorm.Open("mysql", dbStr)
 	if err != nil {
 		log.Fatalf("Got error when connect database, the error is '%v'", err)
