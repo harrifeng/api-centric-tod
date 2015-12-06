@@ -19,11 +19,11 @@ func main() {
 	api := rest.NewApi()
 	api.Use(rest.DefaultDevStack...)
 	router, err := rest.MakeRouter(
-		rest.Get("/reminders", i.GetAllReminders),
-		rest.Post("/reminders", i.PostReminder),
-		rest.Get("/reminders/:id", i.GetReminder),
-		rest.Put("/reminders/:id", i.PutReminder),
-		rest.Delete("/reminders/:id", i.DeleteReminder),
+		rest.Get("/todos", i.GetAllTodos),
+		rest.Post("/todos", i.PostTodo),
+		rest.Get("/todos/:id", i.GetTodo),
+		rest.Put("/todos/:id", i.PutTodo),
+		rest.Delete("/todos/:id", i.DeleteTodo),
 	)
 	if err != nil {
 		log.Fatal(err)
@@ -39,11 +39,12 @@ func CommonFileServer(w rest.ResponseWriter, r *rest.Request) {
 	http.FileServer(http.Dir("static")).ServeHTTP(w.(http.ResponseWriter), r.Request)
 }
 
-type Reminder struct {
-	Id        int64     `json:"id"`
-	Message   string    `sql:"size:1024" json:"message"`
-	CreatedAt time.Time `json:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt"`
+type Todo struct {
+	Id        int64     `json:"Id"`
+	Title     string    `sql:"size:1024" json:"Title"`
+	Done      bool      `json:"Done"`
+	CreatedAt time.Time `json:"CreatedAt"`
+	UpdatedAt time.Time `json:"UpdatedAt"`
 	DeletedAt time.Time `json:"-"`
 }
 
@@ -61,70 +62,71 @@ func (i *Impl) InitDB() {
 }
 
 func (i *Impl) InitSchema() {
-	i.DB.AutoMigrate(&Reminder{})
+	i.DB.AutoMigrate(&Todo{})
 }
 
-func (i *Impl) GetAllReminders(w rest.ResponseWriter, r *rest.Request) {
-	reminders := []Reminder{}
-	i.DB.Find(&reminders)
-	w.WriteJson(&reminders)
+func (i *Impl) GetAllTodos(w rest.ResponseWriter, r *rest.Request) {
+	todos := []Todo{}
+	i.DB.Find(&todos)
+	w.WriteJson(&todos)
 }
 
-func (i *Impl) GetReminder(w rest.ResponseWriter, r *rest.Request) {
+func (i *Impl) GetTodo(w rest.ResponseWriter, r *rest.Request) {
 	id := r.PathParam("id")
-	reminder := Reminder{}
-	if i.DB.First(&reminder, id).Error != nil {
+	todo := Todo{}
+	if i.DB.First(&todo, id).Error != nil {
 		rest.NotFound(w, r)
 		return
 	}
-	w.WriteJson(&reminder)
+	w.WriteJson(&todo)
 }
 
-func (i *Impl) PostReminder(w rest.ResponseWriter, r *rest.Request) {
-	reminder := Reminder{}
-	if err := r.DecodeJsonPayload(&reminder); err != nil {
+func (i *Impl) PostTodo(w rest.ResponseWriter, r *rest.Request) {
+	todo := Todo{}
+	if err := r.DecodeJsonPayload(&todo); err != nil {
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	if err := i.DB.Save(&reminder).Error; err != nil {
+	if err := i.DB.Save(&todo).Error; err != nil {
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	w.WriteJson(&reminder)
+	w.WriteJson(&todo)
 }
 
-func (i *Impl) PutReminder(w rest.ResponseWriter, r *rest.Request) {
+func (i *Impl) PutTodo(w rest.ResponseWriter, r *rest.Request) {
 
 	id := r.PathParam("id")
-	reminder := Reminder{}
-	if i.DB.First(&reminder, id).Error != nil {
+	todo := Todo{}
+	if i.DB.First(&todo, id).Error != nil {
 		rest.NotFound(w, r)
 		return
 	}
 
-	updated := Reminder{}
+	updated := Todo{}
 	if err := r.DecodeJsonPayload(&updated); err != nil {
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	reminder.Message = updated.Message
+	todo.Title = updated.Title
+	todo.Done = updated.Done
 
-	if err := i.DB.Save(&reminder).Error; err != nil {
+	if err := i.DB.Save(&todo).Error; err != nil {
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	w.WriteJson(&reminder)
+	w.WriteJson(&todo)
 }
 
-func (i *Impl) DeleteReminder(w rest.ResponseWriter, r *rest.Request) {
+func (i *Impl) DeleteTodo(w rest.ResponseWriter, r *rest.Request) {
 	id := r.PathParam("id")
-	reminder := Reminder{}
-	if i.DB.First(&reminder, id).Error != nil {
+	todo := Todo{}
+	if i.DB.First(&todo, id).Error != nil {
 		rest.NotFound(w, r)
 		return
 	}
-	if err := i.DB.Delete(&reminder).Error; err != nil {
+	if err := i.DB.Delete(&todo).Error; err != nil {
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

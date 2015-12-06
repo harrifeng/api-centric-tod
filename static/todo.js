@@ -8,14 +8,14 @@ function TaskCtrl($scope, $http) {
     };
 
     var refresh = function() {
-        return $http.get('/task/').
-            success(function(data) { $scope.tasks = data.Tasks; }).
+        return $http.get('/api/todos').
+            success(function(data) { $scope.tasks = data; console.log(data) }).
             error(logError);
     };
 
     $scope.addTodo = function() {
         $scope.working = true;
-        $http.post('/task/', {Title: $scope.todoText}).
+        $http.post('/api/todos', {Title: $scope.todoText}).
             error(logError).
             success(function() {
                 refresh().then(function() {
@@ -26,8 +26,8 @@ function TaskCtrl($scope, $http) {
     };
 
     $scope.toggleDone = function(task) {
-        data = {ID: task.ID, Title: task.Title, Done: !task.Done};
-        $http.put('/task/'+task.ID, data).
+        data = {Id: task.Id, Title: task.Title, Done: !task.Done};
+        $http.put('/api/todos/'+task.Id, data).
             error(logError).
             success(function() { task.Done = !task.Done; });
     };
